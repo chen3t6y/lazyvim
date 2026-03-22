@@ -54,4 +54,5 @@ require("lazy").setup({
   },
 })
 --vim.cmd.colorscheme("desert")
-vim.cmd.colorscheme("catppuccin-mocha")
+--vim.cmd.colorscheme("catppuccin-mocha")
+vim.cmd.colorscheme("catppuccin")
