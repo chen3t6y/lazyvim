@@ -20,3 +20,30 @@ return {
     end,
   },
 }
+
+-- return {
+--   {
+--     "iamcco/markdown-preview.nvim",
+--     cmd = { "MarkdownPreviewToggle", "MarkdownPreview", "MarkdownPreviewStop" },
+--     build = "cd app && npm install",
+--     init = function()
+--       vim.g.mkdp_filetypes = { "markdown" }
+--     end,
+--     config = function()
+--       -- 确保开启了数学公式渲染
+--       vim.g.mkdp_preview_options = {
+--         mkit = {},
+--         katex = {}, -- 或者使用 mathjax
+--         uml = {},
+--         maid = {},
+--         disable_sync_scroll = 0,
+--         sync_scroll_type = "middle",
+--         hide_yaml_meta = 1,
+--       }
+--     end,
+--     -- <leader>cp 就可以
+--     keys = {
+--       { "<leader>mp", "<cmd>MarkdownPreviewToggle<cr>", desc = "Markdown 预览" },
+--     },
+--   },
+-- }

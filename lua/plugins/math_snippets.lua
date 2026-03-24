@@ -20,6 +20,12 @@ return {
       local s = ls.snippet
       local t = ls.text_node
       local i = ls.insert_node
+      local f = ls.function_node
+
+      -- 获取插件自带的数学环境判定函数
+      local is_math = function()
+        return require("luasnip-latex-snippets.util.conditions").is_math()
+      end
 
       -- 3. 添加你的自定义 Snippets
       -- 你可以把这段代码复制到这里
@@ -38,12 +44,52 @@ return {
 
       -- 在 ``` 代码块中添加语言和行号
       ls.add_snippets("markdown", {
-        s("linen", {
+        s({ trig = "linen", name = "Line-Numbers" }, {
           i(1, "c"),
           t(" {.line-numbers}"),
           i(0),
         }),
       })
+      -- aligned 环境
+      -- ls.add_snippets("markdown", {
+      --   s({ trig = "ali", snippetType = "autosnippet" }, {
+      --     t({ "\\begin{aligned}", "\t" }),
+      --     i(1),
+      --     t({ "", "\\end{aligned}" }),
+      --   }),
+      -- })
+      -- 自定义一个判定函数，直接调用 VimTeX
+      -- 这样即便插件内部路径变了，你的判定依然有效
+      local function is_math()
+        -- 检查 VimTeX 的数学区判定
+        return vim.fn["vimtex#syntax#in_mathzone"]() == 1
+      end
+
+      -- 强制将片段注入到 tex 和 markdown
+      for _, ft in ipairs({ "tex", "markdown" }) do
+        ls.add_snippets(ft, {
+          -- ali -> aligned
+          s({ trig = "ali", snippetType = "autosnippet" }, {
+            t({ "\\begin{aligned}", "\t" }),
+            i(1),
+            t({ "", "\\end{aligned}" }),
+          }, { condition = is_math }),
+
+          -- beg -> 自动闭合环境
+          s({ trig = "beg", snippetType = "autosnippet" }, {
+            t("\\begin{"),
+            i(1),
+            t("}"),
+            t({ "", "\t" }),
+            i(0),
+            t({ "", "\\end{" }),
+            ls.function_node(function(args)
+              return args[1][1]
+            end, { 1 }),
+            t("}"),
+          }, { condition = is_math }),
+        }, { type = "autosnippets" })
+      end
     end,
   },
 
