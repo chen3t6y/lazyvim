@@ -50,33 +50,19 @@ return {
           i(0),
         }),
       })
-      -- aligned 环境
-      -- ls.add_snippets("markdown", {
-      --   s({ trig = "ali", snippetType = "autosnippet" }, {
-      --     t({ "\\begin{aligned}", "\t" }),
-      --     i(1),
-      --     t({ "", "\\end{aligned}" }),
-      --   }),
-      -- })
-      -- 自定义一个判定函数，直接调用 VimTeX
-      -- 这样即便插件内部路径变了，你的判定依然有效
-      local function is_math()
-        -- 检查 VimTeX 的数学区判定
-        return vim.fn["vimtex#syntax#in_mathzone"]() == 1
-      end
 
       -- 强制将片段注入到 tex 和 markdown
-      for _, ft in ipairs({ "tex", "markdown" }) do
+      for _, ft in ipairs({ "markdown" }) do
         ls.add_snippets(ft, {
           -- ali -> aligned
-          s({ trig = "ali", snippetType = "autosnippet" }, {
+          s({ trig = "ali" }, {
             t({ "\\begin{aligned}", "\t" }),
             i(1),
             t({ "", "\\end{aligned}" }),
-          }, { condition = is_math }),
+          }),
 
           -- beg -> 自动闭合环境
-          s({ trig = "beg", snippetType = "autosnippet" }, {
+          s({ trig = "beg" }, {
             t("\\begin{"),
             i(1),
             t("}"),
@@ -87,8 +73,8 @@ return {
               return args[1][1]
             end, { 1 }),
             t("}"),
-          }, { condition = is_math }),
-        }, { type = "autosnippets" })
+          }),
+        })
       end
     end,
   },
