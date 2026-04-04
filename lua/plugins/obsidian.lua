@@ -33,6 +33,20 @@ return {
       },
       notes_subdir = "00_Inbox",
       log_level = vim.log.levels.INFO,
+      -- 1. 核心：锁死所有新笔记的落脚点
+
+      -- 2. 命名逻辑：时间戳-标题
+      note_id_func = function(title)
+        local name = ""
+        if title ~= nil and title ~= "" then
+          -- 允许中文、字母、数字、连字符，空格转连字符
+          name = title:gsub(" ", "-"):gsub("[^A-Za-z0-9-一-龥]", ""):lower()
+        else
+          name = "note"
+        end
+        -- return tostring(os.date("%Y%m%d%H%M")) .. "-" .. name
+        return name .. "-" .. tostring(os.date("%Y%m%d%H%M"))
+      end,
       daily_notes = {
         folder = "04_Daily",
         date_format = "%Y-%m-%d",
