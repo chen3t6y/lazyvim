@@ -6,7 +6,7 @@ return {
     dependencies = { "L3MON4D3/LuaSnip", "lervag/vimtex" },
     config = function()
       require("luasnip-latex-snippets").setup({
-        use_treesitter = false, -- 建议设为 false，使用 vimtex 更加准确
+        use_treesitter = true, -- 建议设为 false，使用 vimtex 更加准确
         allow_on_markdown = true, -- 这里直接满足了你想在 md 中使用的需求
       })
 
@@ -52,30 +52,30 @@ return {
       })
 
       -- 强制将片段注入到 tex 和 markdown
-      for _, ft in ipairs({ "markdown" }) do
-        ls.add_snippets(ft, {
-          -- ali -> aligned
-          s({ trig = "ali" }, {
-            t({ "\\begin{aligned}", "\t" }),
-            i(1),
-            t({ "", "\\end{aligned}" }),
-          }),
-
-          -- beg -> 自动闭合环境
-          s({ trig = "beg" }, {
-            t("\\begin{"),
-            i(1),
-            t("}"),
-            t({ "", "\t" }),
-            i(0),
-            t({ "", "\\end{" }),
-            ls.function_node(function(args)
-              return args[1][1]
-            end, { 1 }),
-            t("}"),
-          }),
-        })
-      end
+      -- for _, ft in ipairs({ "markdown" }) do
+      --   ls.add_snippets(ft, {
+      --     -- ali -> aligned
+      --     s({ trig = "ali" }, {
+      --       t({ "\\begin{aligned}", "\t" }),
+      --       i(1),
+      --       t({ "", "\\end{aligned}" }),
+      --     }),
+      --
+      --     -- beg -> 自动闭合环境
+      --     s({ trig = "beg" }, {
+      --       t("\\begin{"),
+      --       i(1),
+      --       t("}"),
+      --       t({ "", "\t" }),
+      --       i(0),
+      --       t({ "", "\\end{" }),
+      --       ls.function_node(function(args)
+      --         return args[1][1]
+      --       end, { 1 }),
+      --       t("}"),
+      --     }),
+      --   })
+      -- end
     end,
   },
 
