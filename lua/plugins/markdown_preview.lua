@@ -3,13 +3,16 @@ return {
     "iamcco/markdown-preview.nvim",
     lazy = false,
     -- 强制启用 node 支持
+    -- 将下面的 build 修改到这里以更强力的安装依赖, 但是这个未测试过
+    build = "cd app && npm install",
     init = function()
       vim.g.loaded_node_provider = nil -- 移除禁用标志
       vim.g.mkdp_filetypes = { "markdown" }
     end,
-    build = function()
-      vim.fn["mkdp#util#install"]()
-    end,
+    -- build = function()
+    --   vim.fn["mkdp#util#install"]()
+    -- end,
+    --
     -- <leader>cp 就可以
     -- keys = {
     --   { "<leader>mp", "<cmd>MarkdownPreviewToggle<cr>", desc = "Markdown 预览" },
