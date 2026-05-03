@@ -28,22 +28,22 @@ return {
       -- 自定义 Frontmatter 生成逻辑
       note_frontmatter_func = function(note)
         -- 准备默认字段
-        local out = {
-          id = note.id,
-          aliases = note.aliases,
-          tags = note.tags,
-          -- 关键：在这里强制加入 bibliography 字段，默认值给个空数组 []
-          bibliography = note.metadata and note.metadata.bibliography or {},
-        }
-
-        -- 保持用户手动在文档里添加的其他元数据
-        if note.metadata ~= nil and not vim.tbl_isempty(note.metadata) then
-          for k, v in pairs(note.metadata) do
-            out[k] = v
-          end
-        end
-
-        return out
+        -- local out = {
+        --   id = note.id,
+        --   aliases = note.aliases,
+        --   tags = note.tags,
+        --   -- 关键：在这里强制加入 bibliography 字段，默认值给个空数组 []
+        --   bibliography = note.metadata and note.metadata.bibliography or {},
+        -- }
+        --
+        -- -- 保持用户手动在文档里添加的其他元数据
+        -- if note.metadata ~= nil and not vim.tbl_isempty(note.metadata) then
+        --   for k, v in pairs(note.metadata) do
+        --     out[k] = v
+        --   end
+        -- end
+        --
+        -- return out
       end,
       workspaces = {
         {
