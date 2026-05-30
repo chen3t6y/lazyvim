@@ -8,6 +8,7 @@ return {
         -- 三行块
         per_filetype = {
           markdown = { "lsp", "path", "snippets" }, -- 显式排除 "buffer"
+          codecompanion = { "codecompanion" },
         },
 
         -- transform_items 是处理补全项的核心函数

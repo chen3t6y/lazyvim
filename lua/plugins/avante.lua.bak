@@ -1,0 +1,141 @@
+-- return {
+--   "yetone/avante.nvim",
+--   event = "VeryLazy",
+--   lazy = false,
+--   version = false, -- 抓取最新 main 分支特性
+--
+--   -- ⚠️ 必须加入此项，若想从源码编译改 true，默认会自动下载预编译二进制
+--   build = vim.fn.has("win32") ~= 0 and "powershell -ExecutionPolicy Bypass -File Build.ps1 -BuildFromSource false"
+--     or "make",
+--
+--   opts = {
+--     -- 1. 指定默认 Provider
+--     --provider = "deepseek",
+--     provider = "gemini",
+--
+--     -- 2. 项目级自定义指令文件（放在项目根目录，名字叫 avante.md，AI 会自动读取）
+--     instructions_file = "avante.md",
+--
+--     -- 3. 基础行为控制
+--     behaviour = {
+--       auto_suggestions = false, -- 极力建议关闭！防止打字时后台疯狂消耗 API
+--       enable_fastapply = false, -- Fast Apply 专为 Morph 模型设计，DeepSeek 用户不建议开启
+--     },
+--
+--     -- 4. 各个 AI 供应商的完整注册表
+--     providers = {
+--       gemini = {
+--         -- model = "gemini-2.5-pro", -- 2026年推荐使用的顶尖模型，也可改为你常用的版本
+--         -- model = "gemini-2.5-flash", -- 2026年推荐使用的顶尖模型，也可改为你常用的版本
+--         -- model = "gemini-3.5-flash", -- 2026年推荐使用的顶尖模型，也可改为你常用的版本
+--         model = "gemini-3.1-flash-lite", -- 2026年推荐使用的顶尖模型，也可改为你常用的版本
+--         max_tokens = 4096,
+--         temperature = 0,
+--       },
+--       deepseek = {
+--         __inherited_from = "openai",
+--         endpoint = "https://api.deepseek.com",
+--         -- model = "deepseek-coder", -- 你也可以根据需要更换为 deepseek-v4-pro 等型号
+--         model = "deepseek-v4-flash", -- 你也可以根据需要更换为 deepseek-v4-pro 等型号
+--         timeout = 30000,
+--         extra_request_body = {
+--           temperature = 0, -- 编程追求准确性，建议设为 0
+--           max_tokens = 8192,
+--           -- 如果之前遇到工具崩溃（bad argument），可以在这里单模型关闭
+--           disable_tools = true,
+--         },
+--       },
+--     },
+--
+--     -- 5. Web 联网搜索功能（AI 可以查实时资料，需在终端 export TAVILY_API_KEY=xxx）
+--     web_search_engine = {
+--       provider = "tavily", -- 可选 tavily, serpapi, google, kagi, brave, searxng
+--       proxy = nil, -- 格式如 "http://127.0.0.1:7890"，有需要可开启
+--     },
+--
+--     -- 6. 全局自定义 Prompt 目录（可不填，若要魔改 Prompt 需创建该目录）
+--     override_prompt_dir = vim.fn.expand("~/.config/nvim/avante_prompts"),
+--
+--     -- 7. 高级 Prompt 规则加载路径优先顺序
+--     rules = {
+--       project_dir = ".avante/rules",
+--       global_dir = "~/.config/avante/rules",
+--     },
+--
+--     -- 8. 全场景侧边栏、文件选取配置
+--     file_selector = {
+--       provider = "telescope", -- 结合 telescope 检索项目文件
+--     },
+--     selector = {
+--       exclude_auto_select = { "NvimTree" }, -- 配合下方 NvimTree 联动
+--     },
+--
+--     -- 9. 界面与交互快捷键映射（严格对照官方最新版）
+--     mappings = {
+--       diff = {
+--         outers = "<leader>ad",
+--         act_as_diff = true, -- 强制开启完美高亮对比模式
+--       },
+--       -- 侧边栏内快捷键
+--       sidebar = {
+--         apply_all = "A",
+--         apply_cursor = "a",
+--         retry = "r",
+--         edit = "e",
+--         switch_windows = "<Tab>",
+--         reverse_switch_windows = "<S-Tab>",
+--         remove_file = "d",
+--         add_file = "@",
+--         close = "q",
+--       },
+--     },
+--   },
+--
+--   -- 10. 官方规定的所有核心依赖与高级扩展插件
+--   dependencies = {
+--     "nvim-lua/plenary.nvim",
+--     "MunifTanjim/nui.nvim",
+--     "nvim-tree/nvim-web-devicons",
+--     "nvim-treesitter/nvim-treesitter",
+--     "nvim-telescope/telescope.nvim", -- 强化文件查找
+--     "stevearc/dressing.nvim", -- 优雅的输入框 UI
+--     {
+--       "MeanderingProgrammer/render-markdown.nvim",
+--       opts = { file_types = { "markdown", "Avante" } },
+--       ft = { "markdown", "Avante" },
+--     },
+--     {
+--       -- 官方强推：支持直接从剪贴板粘贴图片给 AI 看（多模态选配）
+--       "HakonHarnes/img-clip.nvim",
+--       event = "VeryLazy",
+--       opts = {
+--         default = {
+--           embed_image_as_base64 = false,
+--           prompt_for_file_name = false,
+--           drag_and_drop = { insert_mode = true },
+--           use_absolute_path = true, -- 针对 Linux/Windows 路径鲁棒性
+--         },
+--       },
+--     },
+--   },
+--
+--   -- 11. 扩展功能：支持在 NvimTree 里直接用键位拉取文件进 AI 上下文
+--   keys = {
+--     {
+--       "<leader>a+",
+--       function()
+--         require("avante.extensions.nvim_tree").add_file()
+--       end,
+--       desc = "将当前 NvimTree 文件加入 AI 选区",
+--       ft = "NvimTree",
+--     },
+--     {
+--       "<leader>a-",
+--       function()
+--         require("avante.extensions.nvim_tree").remove_file()
+--       end,
+--       desc = "从 AI 选区中移除此 NvimTree 文件",
+--       ft = "NvimTree",
+--     },
+--   },
+-- }
