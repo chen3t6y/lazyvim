@@ -7,8 +7,14 @@ return {
         -- 如果未来使用英语, 英文或其他语言希望开启补全, 注释掉整个 per_filetype
         -- 三行块
         per_filetype = {
-          markdown = { "lsp", "path", "snippets" }, -- 显式排除 "buffer"
-          codecompanion = { "codecompanion" },
+          markdown = {
+            "lsp",
+            "path",
+            "snippets",
+            "obsidian",
+            "obsidian_new",
+            "obsidian_tags",
+          },
         },
 
         -- transform_items 是处理补全项的核心函数

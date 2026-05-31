@@ -45,6 +45,7 @@ return {
         --
         -- return out
       end,
+
       workspaces = {
         {
           name = "chen_note",
