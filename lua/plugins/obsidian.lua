@@ -23,6 +23,8 @@ return {
       { "<leader>ot", "<cmd>ObsidianTemplate<cr>", desc = "Insert Template" },
       { "<leader>ol", "<cmd>ObsidianLink<cr>", desc = "Link Visual Selection", mode = "v" },
       { "<leader>ob", "<cmd>ObsidianBacklinks<cr>", desc = "Show Backlinks" },
+      -- 重命名
+      { "<leader>or", "<cmd>ObsidianRename<cr>", desc = "Rename the Note" },
     },
     opts = {
       -- 自定义 Frontmatter 生成逻辑
@@ -79,9 +81,20 @@ return {
         min_chars = 2,
       },
       templates = {
-        subdir = "Templates",
+        -- subdir = "Templates",
+        folder = "Templates",
         date_format = "%Y-%m-%d",
         time_format = "%H:%M",
+        -- 核心：在这里顺手解决你 {{title}} 会抓取最后一个别名的问题
+        substitutions = {
+          pure_title = function()
+            local name = vim.fn.expand("%:t:r")
+            if name == "" or name == nil then
+              return "New Note"
+            end
+            return name
+          end,
+        },
       },
       attachments = {
         img_folder = "assets",
