@@ -6,7 +6,7 @@ return {
     dependencies = { "L3MON4D3/LuaSnip", "lervag/vimtex" },
     config = function()
       require("luasnip-latex-snippets").setup({
-        use_treesitter = false, -- 建议设为 false，使用 vimtex 更加准确
+        use_treesitter = true, -- 使用 treesitter 检测数学模式，避免 vimtex 解析延迟问题
         allow_on_markdown = true, -- 这里直接满足了你想在 md 中使用的需求
       })
 
@@ -53,7 +53,71 @@ return {
         }),
       })
 
-      -- 强制将片段注入到 tex 和 markdown
+      -- bwA snippets for markdown (plugin filters these out, replaced with is_math condition)
+      local utils = require("luasnip-latex-snippets.util.utils")
+      local pipe = utils.pipe
+      local conds = require("luasnip.extras.expand_conditions")
+      local is_math = utils.with_opts(utils.is_math, true)
+      local condition = pipe({ conds.line_begin, is_math })
+
+      local bwA_s = ls.extend_decorator.apply(ls.snippet, { condition = condition })
+      local bwA_ps = ls.extend_decorator.apply(ls.parser.parse_snippet, { condition = condition })
+
+      ls.add_snippets("markdown", {
+        bwA_s(
+          { trig = "ali", name = "Align" },
+          { t({ "\\begin{align*}", "\t" }), i(1), t({ "", "\\end{align*}" }) }
+        ),
+        bwA_ps({ trig = "beg", name = "begin{} / end{}" }, "\\begin{$1}\n\t$0\n\\end{$1}"),
+        bwA_s(
+          { trig = "bigfun", name = "Big function" },
+          { t({ "\\begin{align*}", "\t" }), i(1), t(":"), t(" "), i(2),
+            t("&\\longrightarrow "), i(3), t({ " \\", "\t" }), i(4),
+            t("&\\longmapsto "), i(1), t("("), i(4), t(")"), t(" = "),
+            i(0), t({ "", "\\end{align*}" }) }
+        ),
+      }, { default_priority = 0 })
+
+      -- Prevent mk from expanding inside fenced code blocks in markdown
+      -- (plugin's mk has condition=not_math which is true in code blocks)
+      local function in_code_block()
+        local node = vim.treesitter.get_node({ ignore_injections = false })
+        if not node then return false end
+        while node do
+          local nt = node:type()
+          if nt == "fenced_code_block" or nt == "indented_code_block" then
+            return true
+          end
+          node = node:parent()
+        end
+        return false
+      end
+
+      local not_math = utils.with_opts(utils.not_math, true)
+      local not_in_code = function() return not in_code_block() end
+      local code_cond = function() return in_code_block() end
+
+      local mk_ok_s = ls.extend_decorator.apply(ls.snippet, {
+        condition = pipe({ not_math, not_in_code }),
+      })
+      local mk_code_s = ls.extend_decorator.apply(ls.snippet, {
+        condition = pipe({ not_math, code_cond }),
+      })
+
+      ls.add_snippets("markdown", {
+        mk_ok_s(
+          { trig = "mk", name = "Math" },
+          { t("$"), i(1), t("$"), i(0) }
+        ),
+        -- Catch-all inside code blocks: expand to literal "mk" (no-op,
+        -- prevents plugin's mk from firing)
+        mk_code_s(
+          { trig = "mk", name = "Math (code block)" },
+          { t("mk") }
+        ),
+      }, { type = "autosnippets", default_priority = 1000 })
+
+      -- 强制将片段注入到 tex 和 markdown (old, replaced by bwA above)
       -- for _, ft in ipairs({ "markdown" }) do
       --   ls.add_snippets(ft, {
       --     -- ali -> aligned

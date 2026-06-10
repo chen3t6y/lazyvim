@@ -4,3 +4,4 @@
 
 vim.opt.textwidth = 80
 vim.opt.colorcolumn = "+1"
+vim.o.shell = "/usr/bin/fish"
