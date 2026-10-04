@@ -77,8 +77,11 @@ local function template_section_map(note)
 end
 
 --- 扫描日记 buffer:返回"改动过的标题"的文字。
---- 规则:模板里没有的标题 → 直接计入;模板里有的标题 → 该标题下内容
---- 与模板不一致(用户改动过)才计入。
+--- 规则:
+---   * 模板里没有的标题 → 直接计入;
+---   * 模板里有的标题 → 该标题下内容与模板不一致(用户改动过)才计入;
+---   * 标题被计入时,它的所有上级标题(祖先链)也一并计入,
+---     例如新增/改动了 ### 箫 时,上级 ## 音乐 也会进 tags。
 local function changed_heading_tags(note)
   local tmpl = template_section_map(note)
   local start = note.frontmatter_end_line or 0
@@ -102,7 +105,18 @@ local function changed_heading_tags(note)
   end
 
   local tags = {}
+  local stack = {} -- 祖先栈:{ level = , text = }
   for k, h in ipairs(headings) do
+    -- 维护祖先栈:弹出 level >= 当前标题的所有栈顶
+    while #stack > 0 and stack[#stack].level >= h.level do
+      table.remove(stack)
+    end
+    -- 栈里剩下的都是当前标题的上级(祖先链)
+    local ancestors = {}
+    for _, a in ipairs(stack) do
+      ancestors[#ancestors + 1] = a.text
+    end
+
     local next_idx = (k < #headings) and headings[k + 1].idx or (#lines + 1)
     -- 内容区块:该标题之后到下一个标题之前的所有非空行
     local block = {}
@@ -112,11 +126,10 @@ local function changed_heading_tags(note)
         block[#block + 1] = s
       end
     end
+
     local tmpl_block = tmpl[h.text]
-    if tmpl_block == nil then
-      -- 模板中没有的新标题 → 直接计入
-      tags[#tags + 1] = h.text
-    else
+    local changed = tmpl_block == nil -- 模板中没有的新标题 → 计入
+    if not changed and tmpl_block ~= nil then
       local same = #block == #tmpl_block
       if same then
         for b = 1, #block do
@@ -126,10 +139,17 @@ local function changed_heading_tags(note)
           end
         end
       end
-      if not same then
-        tags[#tags + 1] = h.text
+      changed = not same
+    end
+
+    if changed then
+      tags[#tags + 1] = h.text
+      for _, a in ipairs(ancestors) do
+        tags[#tags + 1] = a
       end
     end
+
+    table.insert(stack, { level = h.level, text = h.text })
   end
   return tags
 end
